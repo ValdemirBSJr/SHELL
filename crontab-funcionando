@@ -1,0 +1,67 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+#BKP + NETWORK -> TODA A SEXTA
+
+00 06  * * 5 root /home/user/Documentos/SCRIPTS/BKP_SH/ignicao.sh  2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_BKP.txt
+
+#Força atualização TC7337
+
+#05 18 26 05 * root /home/user/Documentos/SCRIPTS/verVersao/verVersao2.sh
+
+#CHECK VERSAO CMTS  -> A CADA 2 MESES  DIA 18
+
+30 06 18 */2 * root /home/user/Documentos/SCRIPTS/PGP_CMTS_VERSION/ignicao.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_VERSAO.txt
+
+#CHECK SEGURANCA CMTS -> MENSAL TODO DIA 18
+
+00 07 18 */1 * root /home/user/Documentos/SCRIPTS/PGP_CMTS_SEGURANCA/ignicao.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_SEGURANCA.txt
+
+#CHECK SERVIDORES DHCP, PRIMARY, DNS, LDAP -> A CADA 3 MESES DIA 24 
+
+30 07 24 */3 * root /home/user/Documentos/SCRIPTS/PGP_SRV/coletaPRIMARY.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_serv-PRIMARY.txt
+
+45 07 24 */3 * root /home/user/Documentos/SCRIPTS/PGP_SRV/coletaDHCP.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_serv-DHCP.txt
+
+00 08 24 */3 * root /home/user/Documentos/SCRIPTS/PGP_SRV/coletaDNS.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_serv-DNS.txt
+
+15 08 24 */3 * root /home/user/Documentos/SCRIPTS/PGP_SRV/coletaLDAP.sh 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_Erro_crontab_serv-LDAP.txt
+
+#X9 -> RODA TODO DIA AS 05:00 DA MANHÃ PROCURANDO ERROS NOS ARQUIVOS DE LOG
+
+30 05 * * * root /home/user/Documentos/SCRIPTS/X9/x9.py 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_erropyX9.txt
+
+#ATUALIZA OS DESCRIPTIONS SNR -> RODA TODO DIA AS 06:00 DA MANHÃ ATUALIZANDO OS NODES DESCRIPTIONS
+
+00 06 * * * root /home/user/Documentos/SCRIPTS/pegaSNR/getRepository.py 2> /home/user/Documentos/SCRIPTS/erros_crontab/getRepoSNR.txt
+
+#ATUALIZA O TRÁFEGO PARA CONSULTA DO FEC A CADA 2 HORAS
+
+0 */2 * * * root /home/user/Documentos/SCRIPTS/pegaSNR/getRepository-traffic.py 2> /home/user/Documentos/SCRIPTS/erros_crontab/getRepoTRAFFIC.txt
+
+
+#executa verificacao do cibilla a cada 10 minutos, se o processo ta parado, restarta
+
+*/5 * * * * root /home/user/Documentos/SCRIPTS/cibillaSNR/ressurge.py 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_ERRO_ressucita-Cibilla.txt 
+
+#*/1 * * * * root pgrep cibilla.py > /dev/null || /home/user/Documentos/SCRIPTS/cibillaSNR/cibilla.py
+
+#troughput -> RODA TODO DIA AS 21:30
+
+#30 21 * * * root /home/user/Documentos/SCRIPTS/troughput/troughput.py 2> /home/user/Documentos/SCRIPTS/erros_crontab/log_erropyTroughput.txt
+
+#FILTROS -> MANDA EMAIL A CADA 6 MESES DIA 1 PARA REALIZAR LIMPEZA
+
+20 08 1 */6 * root sendEmail -o tls=yes -f email-origem@gmail.com -t email-destino1@gmail.com.br, email-destino2@gmail.com.br -s smtp.gmail.com:587 -xu email-otigem@gmail.com -xp senhaemailenvioautomatico  -u LIMPEZA SEMESTRAL DOS FILTROS EQUIPAMENTOS -m Ola, prezados. Hoje temos que efetuar a limpeza de filtros CMTS e network!!! 2> /home/user/Documentos/SCRIPTS/erros_crontab/erro_log_Filtros.txt
